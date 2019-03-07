@@ -14,6 +14,9 @@ import androidx.viewpager.widget.ViewPager;
 
 public class MainActivity extends AppCompatActivity {
     private static final int NUM_OF_TABS = 4;
+    public static final String SORT_SEARCH_BY = "rating";
+    public static final int LIMIT_OF_BUSINESS_RESULTS = 10;
+
     private static final String TAG = "MainActivity";
 
     @Override
