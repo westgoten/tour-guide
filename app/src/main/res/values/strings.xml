@@ -3,10 +3,10 @@
 
     <!-- HTTP Request -->
     <string name="request_header">Bearer (YOUR API KEY)</string>
-    <string name="language">pt_BR</string>
-    <string name="term_landmarks">Pontos Turísticos &amp; Edifícios Históricos</string>
-    <string name="term_restaurants">Restaurantes</string>
+    <string name="language">en_US</string>
+    <string name="term_landmarks">Landmarks &amp; Historical Buildings</string>
+    <string name="term_restaurants">Restaurants</string>
     <string name="restaurant_category">brazilian</string>
-    <string name="term_beaches">Praias</string>
-    <string name="term_bars">Bares</string>
+    <string name="term_beaches">Beaches</string>
+    <string name="term_bars">Bars</string>
 </resources>

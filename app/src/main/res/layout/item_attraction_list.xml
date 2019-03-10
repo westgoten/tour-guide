@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingTop="16dp">
+
+    <ImageView
+        android:id="@+id/business_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:layout_marginRight="20dp"/>
+
+    <TextView
+        android:id="@+id/business_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/business_photo"
+        android:layout_alignTop="@id/business_photo"
+        android:maxLines="1"
+        android:layout_marginBottom="8dp"/>
+
+    <ImageView
+        android:id="@+id/business_rating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:layout_below="@id/business_name"
+        android:layout_alignLeft="@id/business_name"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="16dp"/>
+
+    <TextView
+        android:id="@+id/review_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/business_rating"
+        android:layout_alignLeft="@id/business_rating"
+        android:maxLines="1"
+        android:layout_marginBottom="16dp"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/yelp_trademark"
+        android:minWidth="64dp"
+        android:scaleType="centerCrop"
+        android:layout_alignTop="@id/business_rating"
+        android:layout_toRightOf="@id/business_rating"/>
+
+    <TextView
+        android:id="@+id/divider"
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:layout_below="@id/review_count"
+        android:layout_alignLeft="@id/review_count"
+        android:layout_alignParentRight="true"/>
+
+</RelativeLayout>
