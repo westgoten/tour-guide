@@ -1,11 +1,14 @@
 package com.example.rodrigo.tourguide.models;
 
+import android.graphics.Bitmap;
+
 public class Business {
     private String name;
     private int review_count;
     private float rating;
     private String url;
     private String image_url;
+    private Bitmap businessPhoto;
 
     public Business(String name, int review_count, float rating, String url, String image_url) {
         this.name = name;
@@ -37,5 +40,13 @@ public class Business {
 
     public void setImage_url(String image_url) {
         this.image_url = image_url;
+    }
+
+    public Bitmap getBusinessPhoto() {
+        return businessPhoto;
+    }
+
+    public void setBusinessPhoto(Bitmap businessPhoto) {
+        this.businessPhoto = businessPhoto;
     }
 }
