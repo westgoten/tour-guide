@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 public class AttractionListFragment extends Fragment {
     private int position;
 
+    public enum AttractionType {LANDMARK, RESTAURANT, BEACH, BAR}
+
     public static final String ARG_POSITION = "position";
     private static final String TAG = "AttractionListFragment";
 

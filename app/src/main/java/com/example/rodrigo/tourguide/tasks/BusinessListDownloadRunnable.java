@@ -1,6 +1,7 @@
 package com.example.rodrigo.tourguide.tasks;
 
 import android.util.Log;
+import com.example.rodrigo.tourguide.AttractionListFragment;
 import com.example.rodrigo.tourguide.MainActivityViewModel;
 import com.example.rodrigo.tourguide.models.Business;
 import com.example.rodrigo.tourguide.models.BusinessSearch;
@@ -11,14 +12,15 @@ import java.io.IOException;
 
 public class BusinessListDownloadRunnable implements Runnable {
     private Call<BusinessSearch> businessSearchCall;
+    private AttractionListFragment.AttractionType attractionType;
     private MainActivityViewModel viewModel;
-    private int attractionType;
 
-    public BusinessListDownloadRunnable(Call<BusinessSearch> businessSearchCall, MainActivityViewModel viewModel,
-                                        int attractionType) {
+    public BusinessListDownloadRunnable(Call<BusinessSearch> businessSearchCall,
+                                        AttractionListFragment.AttractionType attractionType,
+                                        MainActivityViewModel viewModel) {
         this.businessSearchCall = businessSearchCall;
-        this.viewModel = viewModel;
         this.attractionType = attractionType;
+        this.viewModel = viewModel;
     }
 
     @Override
@@ -28,7 +30,7 @@ public class BusinessListDownloadRunnable implements Runnable {
             if (response.isSuccessful()) {
                 BusinessSearch businessSearch = response.body();
                 Business[] businesses = businessSearch.getBusinesses();
-                viewModel.getBusinessMatrix().add(attractionType, businesses);
+                viewModel.getBusinessMatrix().put(attractionType, businesses);
             } else {
                 Log.d("BusinessSearchResponse", response.code() + " - " + response.message());
             }

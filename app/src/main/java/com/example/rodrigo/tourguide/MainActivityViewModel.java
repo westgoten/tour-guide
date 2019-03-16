@@ -3,17 +3,20 @@ package com.example.rodrigo.tourguide;
 import androidx.lifecycle.ViewModel;
 import com.example.rodrigo.tourguide.models.Business;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Map;
 
 public class MainActivityViewModel extends ViewModel {
-    private List<Business[]> businessMatrix = new ArrayList<>();
+    private Map<AttractionListFragment.AttractionType, Business[]> businessMatrix = Collections
+            .synchronizedMap(new EnumMap<AttractionListFragment.AttractionType,
+                    Business[]>(AttractionListFragment.AttractionType.class));
 
-    public List<Business[]> getBusinessMatrix() {
+    public Map<AttractionListFragment.AttractionType, Business[]> getBusinessMatrix() {
         return businessMatrix;
     }
 
-    public void setBusinessMatrix(List<Business[]> businessMatrix) {
+    public void setBusinessMatrix(Map<AttractionListFragment.AttractionType, Business[]> businessMatrix) {
         this.businessMatrix = businessMatrix;
     }
 }
