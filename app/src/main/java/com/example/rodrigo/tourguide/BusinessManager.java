@@ -55,25 +55,35 @@ public class BusinessManager {
                 viewModel));
     }
 
-    public void startBusinessPhotoDownload(MainActivityViewModel viewModel) {
+    private void startBusinessPhotoDownload(MainActivityViewModel viewModel) {
         Map<AttractionListFragment.AttractionType, Business[]> businessMatrix = viewModel.getBusinessMatrix();
         for (Business[] businesses : businessMatrix.values()) {
+            totalOfBusinessesDownloaded += businesses.length;
             for (Business business : businesses) {
-                totalOfBusinessesDownloaded++;
                 businessPhotoDownloadThreadPool.execute(new BusinessPhotoDownloadRunnable(business));
             }
         }
     }
 
-    public long getBusinessPhotoThreadPoolCompletedTasks() {
-        return businessPhotoDownloadThreadPool.getCompletedTaskCount();
-    }
+    public void keepTrackOfRequests(final MainActivityViewModel viewModel) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                boolean running = true;
+                while (running) {
+                    if (businessListDownloadThreadPool.getCompletedTaskCount() == AttractionListFragment.AttractionType
+                            .values().length)
+                        running = false;
+                }
+                startBusinessPhotoDownload(viewModel);
 
-    public long getBusinessListThreadPoolCompletedTasks() {
-        return businessListDownloadThreadPool.getCompletedTaskCount();
-    }
-
-    public int getTotalOfBusinessesDownloaded() {
-        return totalOfBusinessesDownloaded;
+                running = true;
+                while (running) {
+                    if (businessPhotoDownloadThreadPool.getCompletedTaskCount() == totalOfBusinessesDownloaded)
+                        running = false;
+                }
+                viewModel.getAreRequestsDone().postValue(true);
+            }
+        }).start();
     }
 }

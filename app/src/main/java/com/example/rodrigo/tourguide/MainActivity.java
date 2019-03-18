@@ -10,8 +10,13 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
+import com.example.rodrigo.tourguide.models.BusinessSearch;
+import retrofit2.Call;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
     MainActivityViewModel viewModel;
@@ -39,37 +44,57 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (savedInstanceState == null) {
-            // TO DO: HTTP Requests
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(YelpService.BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            YelpService yelpService = retrofit.create(YelpService.class);
+            initializeHttpRequests(yelpService);
         }
 
-        AttractionsViewPagerAdapter pagerAdapter = new AttractionsViewPagerAdapter(getSupportFragmentManager());
-
-        ViewPager viewPager = findViewById(R.id.pager);
-        viewPager.setAdapter(pagerAdapter);
+        viewModel.getAreRequestsDone().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if (aBoolean) {
+                    AttractionsViewPagerAdapter pagerAdapter = new AttractionsViewPagerAdapter(getSupportFragmentManager());
+                    ViewPager viewPager = findViewById(R.id.pager);
+                    viewPager.setAdapter(pagerAdapter);
+                }
+            }
+        });
     }
 
-    private void keepTrackOfRequests() { // TO DO
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                BusinessManager sInstance = BusinessManager.getInstance();
+    private void initializeHttpRequests(YelpService yelpService) {
+        BusinessManager businessManager = BusinessManager.getInstance();
 
-                boolean running = true;
-                while (running) {
-                    if (sInstance.getBusinessListThreadPoolCompletedTasks() == AttractionListFragment.AttractionType
-                            .values().length)
-                        running = false;
-                    // Shutdown ThreadPoolExecutor
-                }
-                sInstance.startBusinessPhotoDownload(viewModel);
+        viewModel.getAreRequestsDone().setValue(false);
 
-                running = true;
-                while (running) {
-                    // totalBusinesses == completedTasks
-                }
-                // Do something to indicate that the data requests are finished
-            }
-        }).start();
+        Call<BusinessSearch> businessSearchCall1 = yelpService.getBusinessSearch(getString(R.string.request_header),
+                getString(R.string.term_landmarks), null, SORT_SEARCH_BY, getString(R.string.language),
+                LIMIT_OF_BUSINESS_RESULTS);
+        businessManager.startBusinessListDownload(businessSearchCall1,
+                AttractionListFragment.AttractionType.LANDMARK, viewModel);
+
+        Call<BusinessSearch> businessSearchCall2 = yelpService.getBusinessSearch(getString(R.string.request_header),
+                getString(R.string.term_restaurants), getString(R.string.restaurant_category), SORT_SEARCH_BY,
+                getString(R.string.language), LIMIT_OF_BUSINESS_RESULTS);
+        businessManager.startBusinessListDownload(businessSearchCall2,
+                AttractionListFragment.AttractionType.RESTAURANT, viewModel);
+
+        Call<BusinessSearch> businessSearchCall3 = yelpService.getBusinessSearch(getString(R.string.request_header),
+                getString(R.string.term_beaches), null, SORT_SEARCH_BY, getString(R.string.language),
+                LIMIT_OF_BUSINESS_RESULTS);
+        businessManager.startBusinessListDownload(businessSearchCall3,
+                AttractionListFragment.AttractionType.BEACH, viewModel);
+
+        Call<BusinessSearch> businessSearchCall4 = yelpService.getBusinessSearch(getString(R.string.request_header),
+                getString(R.string.term_bars), null, SORT_SEARCH_BY, getString(R.string.language),
+                LIMIT_OF_BUSINESS_RESULTS);
+        businessManager.startBusinessListDownload(businessSearchCall4,
+                AttractionListFragment.AttractionType.BAR, viewModel);
+
+        businessManager.keepTrackOfRequests(viewModel);
     }
 
     private class AttractionsViewPagerAdapter extends FragmentPagerAdapter {
