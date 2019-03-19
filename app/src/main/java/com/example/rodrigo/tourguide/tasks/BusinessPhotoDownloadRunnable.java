@@ -17,10 +17,11 @@ public class BusinessPhotoDownloadRunnable implements Runnable {
     @Override
     public void run() {
         String imagePath = business.getImage_url();
+        imagePath = imagePath.substring(0, imagePath.length()-5) + "l.jpg";
         try {
             Bitmap businessPhoto = Picasso.get().load(imagePath)
-                    .placeholder(R.color.black)
-                    .error(R.color.holo_red_light)
+                    .placeholder(android.R.color.black)
+                    .error(android.R.color.holo_red_light)
                     .get();
             business.setBusinessPhoto(businessPhoto);
         } catch (IOException e) {

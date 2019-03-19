@@ -9,4 +9,7 @@
     <string name="restaurant_category">brazilian</string>
     <string name="term_beaches">Beaches</string>
     <string name="term_bars">Bars</string>
+
+    <!-- Attraction List Item -->
+    <string name="review_count">Based on %d reviews</string>
 </resources>

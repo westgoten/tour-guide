@@ -7,9 +7,9 @@ import retrofit2.http.Header;
 import retrofit2.http.Query;
 
 public interface YelpService {
-    String BASE_URL = "https://api.yelp.com/v3";
+    String BASE_URL = "https://api.yelp.com/v3/";
 
-    @GET("/businesses/search?location=Salvador, Bahia")
+    @GET("businesses/search?location=Salvador, Bahia")
     Call<BusinessSearch> getBusinessSearch(@Header("Authorization") String header, @Query("term") String searchTerm,
                                            @Query("categories") String category, @Query("sort_by") String mode,
                                            @Query("locale") String language, @Query("limit") int limitOfBusinessResults);
