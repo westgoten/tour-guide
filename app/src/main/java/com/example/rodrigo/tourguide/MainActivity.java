@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int NUM_OF_TABS = 4;
     public static final String SORT_SEARCH_BY = "rating";
-    public static final int LIMIT_OF_BUSINESS_RESULTS = 10;
+    public static final int LIMIT_OF_BUSINESS_RESULTS = 20;
 
     private static final String TAG = "MainActivity";
 
@@ -121,7 +121,13 @@ public class MainActivity extends AppCompatActivity {
         @Nullable
         @Override
         public CharSequence getPageTitle(int position) {
-            return "tab " + position;
+            for (AttractionListFragment.AttractionType attractionType : AttractionListFragment.AttractionType.values()) {
+                if (attractionType.ordinal() == position) {
+                    return getString(attractionType.getStringResId());
+                }
+            }
+
+            return null;
         }
     }
 }

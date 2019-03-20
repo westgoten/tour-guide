@@ -16,7 +16,21 @@ import com.example.rodrigo.tourguide.models.Business;
 public class AttractionListFragment extends Fragment {
     private int position;
 
-    public enum AttractionType {LANDMARK, RESTAURANT, BEACH, BAR}
+    public enum AttractionType {LANDMARK(R.string.term_landmarks),
+        RESTAURANT(R.string.term_restaurants),
+        BEACH(R.string.term_beaches),
+        BAR(R.string.term_bars);
+
+        private int stringResId;
+
+        AttractionType(int stringResId) {
+            this.stringResId = stringResId;
+        }
+
+        public int getStringResId() {
+            return stringResId;
+        }
+    }
 
     public static final String ARG_POSITION = "position";
     private static final String TAG = "AttractionListFragment";
@@ -47,7 +61,7 @@ public class AttractionListFragment extends Fragment {
         }
 
         if (businesses != null) {
-            AttractionListRecyclerViewAdapter viewAdapter = new AttractionListRecyclerViewAdapter(businesses);
+            AttractionListRecyclerViewAdapter viewAdapter = new AttractionListRecyclerViewAdapter(businesses, getContext());
             recyclerView.setAdapter(viewAdapter);
         } else {
             Log.d(TAG, "Businesses data set is null");

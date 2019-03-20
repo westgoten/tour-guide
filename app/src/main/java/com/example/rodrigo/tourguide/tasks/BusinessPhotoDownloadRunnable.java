@@ -17,15 +17,19 @@ public class BusinessPhotoDownloadRunnable implements Runnable {
     @Override
     public void run() {
         String imagePath = business.getImage_url();
-        imagePath = imagePath.substring(0, imagePath.length()-5) + "l.jpg";
-        try {
-            Bitmap businessPhoto = Picasso.get().load(imagePath)
-                    .placeholder(android.R.color.black)
-                    .error(android.R.color.holo_red_light)
-                    .get();
-            business.setBusinessPhoto(businessPhoto);
-        } catch (IOException e) {
-            Log.d("BusinessPhotoRequest", e.getClass().getSimpleName() + " - " + e.getMessage());
+        if (imagePath.length() > 0) {
+            imagePath = imagePath.substring(0, imagePath.length() - 5) + "l.jpg";
+            try {
+                Bitmap businessPhoto = Picasso.get().load(imagePath)
+                        .placeholder(android.R.color.black)
+                        .error(android.R.color.holo_red_light)
+                        .get();
+                business.setBusinessPhoto(businessPhoto);
+            } catch (IOException e) {
+                Log.d("BusinessPhotoRequest", e.getClass().getSimpleName() + " - " + e.getMessage());
+            }
+        } else {
+            Log.d(getClass().getSimpleName(), "Business doesn't have an image url");
         }
     }
 }
