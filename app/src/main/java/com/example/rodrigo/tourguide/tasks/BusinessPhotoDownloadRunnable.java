@@ -1,7 +1,7 @@
 package com.example.rodrigo.tourguide.tasks;
 
+import com.example.rodrigo.tourguide.R;
 import android.graphics.Bitmap;
-import android.util.Log;
 import com.example.rodrigo.tourguide.models.Business;
 import com.squareup.picasso.Picasso;
 
@@ -20,16 +20,15 @@ public class BusinessPhotoDownloadRunnable implements Runnable {
         if (imagePath.length() > 0) {
             imagePath = imagePath.substring(0, imagePath.length() - 5) + "l.jpg";
             try {
-                Bitmap businessPhoto = Picasso.get().load(imagePath)
-                        .placeholder(android.R.color.black)
-                        .error(android.R.color.holo_red_light)
-                        .get();
+                Bitmap businessPhoto = Picasso.get().load(imagePath).get();
                 business.setBusinessPhoto(businessPhoto);
             } catch (IOException e) {
-                Log.d("BusinessPhotoRequest", e.getClass().getSimpleName() + " - " + e.getMessage());
+                business.setBusinessPhoto(null);
+                business.setHasImageDownloadFailed(true);
             }
         } else {
-            Log.d(getClass().getSimpleName(), "Business doesn't have an image url");
+            business.setBusinessPhoto(null);
+            business.setHasImageDownloadFailed(false);
         }
     }
 }

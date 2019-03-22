@@ -34,6 +34,17 @@ public class MainActivity extends AppCompatActivity {
 
         viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
+        viewModel.getAreRequestsDone().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if (aBoolean) {
+                    AttractionsViewPagerAdapter pagerAdapter = new AttractionsViewPagerAdapter(getSupportFragmentManager());
+                    ViewPager viewPager = findViewById(R.id.pager);
+                    viewPager.setAdapter(pagerAdapter);
+                }
+            }
+        });
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -52,17 +63,6 @@ public class MainActivity extends AppCompatActivity {
             YelpService yelpService = retrofit.create(YelpService.class);
             initializeHttpRequests(yelpService);
         }
-
-        viewModel.getAreRequestsDone().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                if (aBoolean) {
-                    AttractionsViewPagerAdapter pagerAdapter = new AttractionsViewPagerAdapter(getSupportFragmentManager());
-                    ViewPager viewPager = findViewById(R.id.pager);
-                    viewPager.setAdapter(pagerAdapter);
-                }
-            }
-        });
     }
 
     private void initializeHttpRequests(YelpService yelpService) {

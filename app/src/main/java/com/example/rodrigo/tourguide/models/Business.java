@@ -9,6 +9,7 @@ public class Business {
     private String url;
     private String image_url;
     private Bitmap businessPhoto;
+    private boolean hasImageDownloadFailed;
 
     public Business(String name, int review_count, float rating, String url, String image_url) {
         this.name = name;
@@ -48,5 +49,13 @@ public class Business {
 
     public void setBusinessPhoto(Bitmap businessPhoto) {
         this.businessPhoto = businessPhoto;
+    }
+
+    public boolean hasImageDownloadFailed() {
+        return hasImageDownloadFailed;
+    }
+
+    public void setHasImageDownloadFailed(boolean hasImageDownloadFailed) {
+        this.hasImageDownloadFailed = hasImageDownloadFailed;
     }
 }

@@ -16,15 +16,16 @@ import com.example.rodrigo.tourguide.models.Business;
 
 public class AttractionListRecyclerViewAdapter extends RecyclerView.Adapter<AttractionListRecyclerViewAdapter.ViewHolder> {
     private Business[] businesses;
+    private String reviewCountText;
     private Context context;
 
     public AttractionListRecyclerViewAdapter(Business[] businesses, Context context) {
         this.businesses = businesses;
         this.context = context;
+        this.reviewCountText = context.getString(R.string.review_count);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public RelativeLayout relativeLayout;
         public ImageView businessPhoto;
         public TextView businessName;
         public ImageView businessRating;
@@ -32,7 +33,6 @@ public class AttractionListRecyclerViewAdapter extends RecyclerView.Adapter<Attr
         public ImageView yelpTrademark;
         public ViewHolder(RelativeLayout relativeLayout) {
             super(relativeLayout);
-            this.relativeLayout = relativeLayout;
             this.businessPhoto = (ImageView) relativeLayout.getChildAt(0);
             this.businessName = (TextView) relativeLayout.getChildAt(1);
             this.businessRating = (ImageView) relativeLayout.getChildAt(2);
@@ -54,10 +54,16 @@ public class AttractionListRecyclerViewAdapter extends RecyclerView.Adapter<Attr
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Business business = businesses[position];
 
-        holder.businessPhoto.setImageBitmap(business.getBusinessPhoto());
-        holder.businessName.setText(business.getName());
-        String text = holder.reviewCount.getText().toString();
-        holder.reviewCount.setText(String.format(text, business.getReview_count()));
+        if (business.getBusinessPhoto() != null)
+            holder.businessPhoto.setImageBitmap(business.getBusinessPhoto());
+        else if (business.hasImageDownloadFailed())
+            holder.businessPhoto.setImageResource(R.drawable.baseline_error_24);
+        else
+            holder.businessPhoto.setImageResource(R.drawable.baseline_image_24);
+
+        String title = (position+1) + ".  " + business.getName();
+        holder.businessName.setText(title);
+        holder.reviewCount.setText(String.format(reviewCountText, business.getReview_count()));
 
         holder.yelpTrademark.setOnClickListener(new View.OnClickListener() {
             @Override
