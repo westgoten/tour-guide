@@ -20,10 +20,6 @@ public class MainActivityViewModel extends ViewModel {
         return businessMatrix;
     }
 
-    public void setBusinessMatrix(Map<AttractionListFragment.AttractionType, Business[]> businessMatrix) {
-        this.businessMatrix = businessMatrix;
-    }
-
     public MutableLiveData<Boolean> getAreRequestsDone() {
         return areRequestsDone;
     }

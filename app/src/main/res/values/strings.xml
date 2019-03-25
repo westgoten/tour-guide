@@ -12,4 +12,7 @@
 
     <!-- Attraction List Item -->
     <string name="review_count">Based on %d reviews</string>
+
+    <!-- Loading animation -->
+    <string name="loading">Loading data</string>
 </resources>

@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:textSize="16sp"
         android:textColor="@android:color/black"
-        android:layout_toRightOf="@+id/business_photo"
+        android:layout_toRightOf="@id/business_photo"
         android:layout_alignTop="@id/business_photo"
         android:layout_marginBottom="8dp"/>
 

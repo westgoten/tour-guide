@@ -2,6 +2,8 @@ package com.example.rodrigo.tourguide;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -14,12 +16,16 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 import com.example.rodrigo.tourguide.models.BusinessSearch;
+import com.google.android.material.tabs.TabLayout;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
-    MainActivityViewModel viewModel;
+    private MainActivityViewModel viewModel;
+
+    private TabLayout tabLayout;
+    private LinearLayout loading;
 
     private static final int NUM_OF_TABS = 4;
     public static final String SORT_SEARCH_BY = "rating";
@@ -32,6 +38,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        tabLayout = findViewById(R.id.tab_layout);
+        loading = findViewById(R.id.loading);
+
         viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
         viewModel.getAreRequestsDone().observe(this, new Observer<Boolean>() {
@@ -41,18 +53,18 @@ public class MainActivity extends AppCompatActivity {
                     AttractionsViewPagerAdapter pagerAdapter = new AttractionsViewPagerAdapter(getSupportFragmentManager());
                     ViewPager viewPager = findViewById(R.id.pager);
                     viewPager.setAdapter(pagerAdapter);
+
+                    loading.setVisibility(View.GONE);
+                    tabLayout.setVisibility(View.VISIBLE);
+
+                    if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                        ActionBar actionBar = getSupportActionBar();
+                        if (actionBar != null)
+                            actionBar.hide();
+                    }
                 }
             }
         });
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null)
-                actionBar.hide();
-        }
 
         if (savedInstanceState == null) {
             Retrofit retrofit = new Retrofit.Builder()
