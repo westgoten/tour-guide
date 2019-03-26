@@ -1,13 +1,15 @@
 package com.example.rodrigo.tourguide.models;
 
-public class BusinessSearch {
-    private Business[] businesses;
+import java.util.List;
 
-    public BusinessSearch(Business[] businesses) {
+public class BusinessSearch {
+    private List<Business> businesses;
+
+    public BusinessSearch(List<Business> businesses) {
         this.businesses = businesses;
     }
 
-    public Business[] getBusinesses() {
+    public List<Business> getBusinesses() {
         return businesses;
     }
 }

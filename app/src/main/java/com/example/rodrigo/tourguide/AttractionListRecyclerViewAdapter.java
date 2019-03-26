@@ -14,12 +14,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.rodrigo.tourguide.models.Business;
 
+import java.util.List;
+
 public class AttractionListRecyclerViewAdapter extends RecyclerView.Adapter<AttractionListRecyclerViewAdapter.ViewHolder> {
-    private Business[] businesses;
+    private List<Business> businesses;
     private String reviewCountText;
     private Context context;
 
-    public AttractionListRecyclerViewAdapter(Business[] businesses, Context context) {
+    public AttractionListRecyclerViewAdapter(List<Business> businesses, Context context) {
         this.businesses = businesses;
         this.context = context;
         this.reviewCountText = context.getString(R.string.review_count);
@@ -52,7 +54,7 @@ public class AttractionListRecyclerViewAdapter extends RecyclerView.Adapter<Attr
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        final Business business = businesses[position];
+        final Business business = businesses.get(position);
 
         if (business.getBusinessPhoto() != null)
             holder.businessPhoto.setImageBitmap(business.getBusinessPhoto());
@@ -61,8 +63,7 @@ public class AttractionListRecyclerViewAdapter extends RecyclerView.Adapter<Attr
         else
             holder.businessPhoto.setImageResource(R.drawable.baseline_image_24);
 
-        String title = (position+1) + ".  " + business.getName();
-        holder.businessName.setText(title);
+        holder.businessName.setText(business.getName());
         holder.reviewCount.setText(String.format(reviewCountText, business.getReview_count()));
 
         holder.yelpTrademark.setOnClickListener(new View.OnClickListener() {
@@ -115,6 +116,6 @@ public class AttractionListRecyclerViewAdapter extends RecyclerView.Adapter<Attr
 
     @Override
     public int getItemCount() {
-        return businesses.length;
+        return businesses.size();
     }
 }

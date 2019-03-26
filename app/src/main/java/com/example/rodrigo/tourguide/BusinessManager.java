@@ -6,6 +6,8 @@ import com.example.rodrigo.tourguide.tasks.BusinessListDownloadRunnable;
 import com.example.rodrigo.tourguide.tasks.BusinessPhotoDownloadRunnable;
 import retrofit2.Call;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -56,11 +58,18 @@ public class BusinessManager {
     }
 
     private void startBusinessPhotoDownload(MainActivityViewModel viewModel) {
-        Map<AttractionListFragment.AttractionType, Business[]> businessMatrix = viewModel.getBusinessMatrix();
-        for (Business[] businesses : businessMatrix.values()) {
-            totalOfBusinessesDownloaded += businesses.length;
-            for (Business business : businesses) {
-                businessPhotoDownloadThreadPool.execute(new BusinessPhotoDownloadRunnable(business));
+        Map<AttractionListFragment.AttractionType, List<Business>> businessMatrix = viewModel.getBusinessMatrix();
+        for (List<Business> businesses : businessMatrix.values()) {
+            totalOfBusinessesDownloaded += businesses.size();
+            Iterator<Business> iterator = businesses.iterator();
+            while (iterator.hasNext()) {
+                Business business = iterator.next();
+                if (business.getName().equalsIgnoreCase("Salvador")) {
+                    iterator.remove();
+                    totalOfBusinessesDownloaded--;
+                } else {
+                    businessPhotoDownloadThreadPool.execute(new BusinessPhotoDownloadRunnable(business));
+                }
             }
         }
     }
@@ -82,8 +91,15 @@ public class BusinessManager {
                     if (businessPhotoDownloadThreadPool.getCompletedTaskCount() == totalOfBusinessesDownloaded)
                         running = false;
                 }
+
                 viewModel.getAreRequestsDone().postValue(true);
+
+                resetInstance();
             }
         }).start();
+    }
+
+    private void resetInstance() {
+        sInstance = new BusinessManager();
     }
 }

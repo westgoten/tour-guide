@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.rodrigo.tourguide.models.Business;
 
+import java.util.List;
+
 public class AttractionListFragment extends Fragment {
     private int position;
 
@@ -52,7 +54,7 @@ public class AttractionListFragment extends Fragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        Business[] businesses = null;
+        List<Business> businesses = null;
         for (AttractionType attractionType : AttractionType.values()) {
             if (attractionType.ordinal() == position) {
                 businesses = viewModel.getBusinessMatrix().get(attractionType);

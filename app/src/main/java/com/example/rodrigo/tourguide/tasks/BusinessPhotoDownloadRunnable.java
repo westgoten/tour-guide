@@ -1,6 +1,5 @@
 package com.example.rodrigo.tourguide.tasks;
 
-import com.example.rodrigo.tourguide.R;
 import android.graphics.Bitmap;
 import com.example.rodrigo.tourguide.models.Business;
 import com.squareup.picasso.Picasso;

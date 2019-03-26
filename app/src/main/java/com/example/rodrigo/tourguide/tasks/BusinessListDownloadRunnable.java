@@ -9,6 +9,7 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 import java.io.IOException;
+import java.util.List;
 
 public class BusinessListDownloadRunnable implements Runnable {
     private Call<BusinessSearch> businessSearchCall;
@@ -29,7 +30,7 @@ public class BusinessListDownloadRunnable implements Runnable {
             Response<BusinessSearch> response = businessSearchCall.execute();
             if (response.isSuccessful()) {
                 BusinessSearch businessSearch = response.body();
-                Business[] businesses = businessSearch.getBusinesses();
+                List<Business> businesses = businessSearch.getBusinesses();
                 viewModel.getBusinessMatrix().put(attractionType, businesses);
             } else {
                 Log.d("BusinessSearchResponse", response.code() + " - " + response.message());
