@@ -14,14 +14,13 @@ public class MainActivityViewModel extends ViewModel {
             Collections.synchronizedMap(
                     new EnumMap<AttractionListFragment.AttractionType, List<Business>>(
                             AttractionListFragment.AttractionType.class));
-
     private MutableLiveData<Boolean> areRequestsDone = new MutableLiveData<>();
 
     public Map<AttractionListFragment.AttractionType, List<Business>> getBusinessMatrix() {
         return businessMatrix;
     }
 
-    public MutableLiveData<Boolean> getAreRequestsDone() {
+    public MutableLiveData<Boolean> areRequestsDone() {
         return areRequestsDone;
     }
 }

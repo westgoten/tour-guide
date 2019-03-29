@@ -16,6 +16,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 import com.example.rodrigo.tourguide.models.BusinessSearch;
+import com.example.rodrigo.tourguide.tasks.BusinessManager;
 import com.google.android.material.tabs.TabLayout;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
-        viewModel.getAreRequestsDone().observe(this, new Observer<Boolean>() {
+        viewModel.areRequestsDone().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
                 if (aBoolean) {
@@ -67,20 +68,21 @@ public class MainActivity extends AppCompatActivity {
         });
 
         if (savedInstanceState == null) {
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(YelpService.BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-
-            YelpService yelpService = retrofit.create(YelpService.class);
-            initializeHttpRequests(yelpService);
+            initializeHttpRequests();
         }
     }
 
-    private void initializeHttpRequests(YelpService yelpService) {
+    private void initializeHttpRequests() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(YelpService.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        YelpService yelpService = retrofit.create(YelpService.class);
+
         BusinessManager businessManager = BusinessManager.getInstance();
 
-        viewModel.getAreRequestsDone().setValue(false);
+        viewModel.areRequestsDone().setValue(false);
 
         Call<BusinessSearch> businessSearchCall1 = yelpService.getBusinessSearch(getString(R.string.request_header),
                 getString(R.string.term_landmarks), null, SORT_SEARCH_BY, getString(R.string.language),
