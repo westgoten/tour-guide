@@ -7,14 +7,16 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.Locale;
 
 public class BusinessListsDbHelper extends SQLiteOpenHelper {
+    private static BusinessListsDbHelper sInstance;
+
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "BusinessLists.db";
 
     public static final int NUMBER_OF_TABLES = 4;
     private static final String SQL_CREATE_ENTRY =
-            "CREATE TABLE " + BusinessListsContract.BusinessListsEntry.TABLE_NAME + " (" +
+            "CREATE TABLE " + BusinessListsContract.BusinessListsEntry.TABLE_NAME + "%d" + " (" +
                     BusinessListsContract.BusinessListsEntry._ID + " INTEGER PRIMARY KEY," +
-                    BusinessListsContract.BusinessListsEntry.COLUMN_NAME_NAME + "%d" + " TEXT," +
+                    BusinessListsContract.BusinessListsEntry.COLUMN_NAME_NAME + " TEXT," +
                     BusinessListsContract.BusinessListsEntry.COLUMN_NAME_REVIEW_COUNT + " INTEGER," +
                     BusinessListsContract.BusinessListsEntry.COLUMN_NAME_RATING + " REAL," +
                     BusinessListsContract.BusinessListsEntry.COLUMN_NAME_URL + " TEXT," +
@@ -23,7 +25,14 @@ public class BusinessListsDbHelper extends SQLiteOpenHelper {
     private static final String SQL_DELETE_ENTRY =
             "DROP TABLE IF EXISTS " + BusinessListsContract.BusinessListsEntry.TABLE_NAME + "%d";
 
-    public BusinessListsDbHelper(Context context) {
+    public static synchronized BusinessListsDbHelper getInstance(Context context) {
+        if (sInstance == null) {
+            sInstance = new BusinessListsDbHelper(context.getApplicationContext());
+        }
+        return sInstance;
+    }
+
+    private BusinessListsDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

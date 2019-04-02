@@ -21,9 +21,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class BusinessManager {
+    private boolean isOffline;
     private int totalOfBusinessesDownloaded;
     private int totalOfPhotosDecoded;
-    private boolean isFetchingDone;
 
     private final BlockingQueue<Runnable> businessPhotoDownloadWorkQueue;
     private final BlockingQueue<Runnable> businessListDownloadWorkQueue;
@@ -92,12 +92,12 @@ public class BusinessManager {
     }
 
     public void fetchBusinessListsFromDatabase(final MainActivityViewModel viewModel, Context context) {
-        final BusinessListsDbHelper dbHelper = new BusinessListsDbHelper(context);
+        final BusinessListsDbHelper dbHelper = BusinessListsDbHelper.getInstance(context);
+        viewModel.areRequestsDone().setValue(false);
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                isFetchingDone = false;
                 SQLiteDatabase db = dbHelper.getReadableDatabase();
 
                 String[] columns = {BusinessListsContract.BusinessListsEntry.COLUMN_NAME_NAME,
@@ -106,7 +106,7 @@ public class BusinessManager {
                         BusinessListsContract.BusinessListsEntry.COLUMN_NAME_URL,
                         BusinessListsContract.BusinessListsEntry.COLUMN_NAME_PHOTO};
 
-                String sortOrder = BusinessListsContract.BusinessListsEntry._ID + "ASC";
+                String sortOrder = BusinessListsContract.BusinessListsEntry._ID + " ASC";
 
                 db.beginTransaction();
                 try {
@@ -118,6 +118,12 @@ public class BusinessManager {
                                 null,
                                 null,
                                 sortOrder);
+
+                        if (cursor.getCount() == 0) {
+                            cursor.close();
+                            viewModel.isDatabaseEmpty().postValue(true);
+                            break;
+                        }
 
                         List<Business> businesses = new ArrayList<>();
                         totalOfPhotosDecoded += cursor.getCount();
@@ -147,13 +153,14 @@ public class BusinessManager {
                     db.setTransactionSuccessful();
                 } finally {
                     db.endTransaction();
-                    isFetchingDone = true;
                 }
             }
         }).start();
+
+        keepTrackOfDatabaseFetching(viewModel);
     }
 
-    public void keepTrackOfRequests(final MainActivityViewModel viewModel) {
+    public void keepTrackOfRequests(final MainActivityViewModel viewModel, final Context context) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -171,19 +178,22 @@ public class BusinessManager {
                         running = false;
                 }
 
-                viewModel.areRequestsDone().postValue(true);
-                resetInstance();
+                if (!isOffline) {
+                    viewModel.areRequestsDone().postValue(true);
+                    resetInstance();
+                } else
+                    fetchBusinessListsFromDatabase(viewModel, context);
             }
         }).start();
     }
 
-    public void keepTrackOfDatabaseFetching(final MainActivityViewModel viewModel) {
+    private void keepTrackOfDatabaseFetching(final MainActivityViewModel viewModel) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 boolean running = true;
                 while (running) {
-                    if (isFetchingDone && businessPhotoDecodeThreadPool.getCompletedTaskCount() == totalOfPhotosDecoded)
+                    if (businessPhotoDecodeThreadPool.getCompletedTaskCount() == totalOfPhotosDecoded)
                         running = false;
                 }
 
@@ -195,5 +205,9 @@ public class BusinessManager {
 
     private void resetInstance() {
         sInstance = new BusinessManager();
+    }
+
+    public void setOffline(boolean offline) {
+        isOffline = offline;
     }
 }

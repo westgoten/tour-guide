@@ -8,7 +8,6 @@ import com.example.rodrigo.tourguide.models.BusinessSearch;
 import retrofit2.Call;
 import retrofit2.Response;
 
-import java.io.IOException;
 import java.util.List;
 
 public class BusinessListDownloadRunnable implements Runnable {
@@ -33,12 +32,10 @@ public class BusinessListDownloadRunnable implements Runnable {
                 List<Business> businesses = businessSearch.getBusinesses();
                 viewModel.getBusinessMatrix().put(attractionType, businesses);
             } else {
-                Log.d("BusinessSearchResponse", response.code() + " - " + response.message());
+                BusinessManager.getInstance().setOffline(true);
             }
-        } catch (IOException e) {
-            Log.d("BusinessSearchCall", e.getClass().getSimpleName() + " - " + e.getMessage());
-        } catch (RuntimeException e) {
-            Log.d("BusinessSearchCall", e.getClass().getSimpleName() + " - " + e.getMessage());
+        } catch (Exception e) {
+            BusinessManager.getInstance().setOffline(true);
         }
     }
 }

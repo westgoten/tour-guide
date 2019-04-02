@@ -15,6 +15,7 @@ public class MainActivityViewModel extends ViewModel {
                     new EnumMap<AttractionListFragment.AttractionType, List<Business>>(
                             AttractionListFragment.AttractionType.class));
     private MutableLiveData<Boolean> areRequestsDone = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isDatabaseEmpty = new MutableLiveData<>();
 
     public Map<AttractionListFragment.AttractionType, List<Business>> getBusinessMatrix() {
         return businessMatrix;
@@ -22,5 +23,9 @@ public class MainActivityViewModel extends ViewModel {
 
     public MutableLiveData<Boolean> areRequestsDone() {
         return areRequestsDone;
+    }
+
+    public MutableLiveData<Boolean> isDatabaseEmpty() {
+        return isDatabaseEmpty;
     }
 }
