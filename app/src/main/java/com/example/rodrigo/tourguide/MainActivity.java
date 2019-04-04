@@ -32,10 +32,11 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private LinearLayout loading;
     private LinearLayout offlineMessage;
+    private boolean wasTryAgainButtonPressed;
 
     private static final int NUM_OF_TABS = 4;
-    public static final String SORT_SEARCH_BY = "rating";
-    public static final int LIMIT_OF_BUSINESS_RESULTS = 20;
+    private static final String SORT_SEARCH_BY = "rating";
+    private static final int LIMIT_OF_BUSINESS_RESULTS = 20;
 
     private static final String TAG = "MainActivity";
 
@@ -44,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -51,17 +54,30 @@ public class MainActivity extends AppCompatActivity {
         loading = findViewById(R.id.loading);
         offlineMessage = findViewById(R.id.offline);
 
+        wasTryAgainButtonPressed = false;
         Button tryAgainButton = (Button) offlineMessage.getChildAt(2);
         tryAgainButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                wasTryAgainButtonPressed = true;
                 offlineMessage.setVisibility(View.GONE);
                 loading.setVisibility(View.VISIBLE);
                 initializeHttpRequests();
             }
         });
 
-        viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
+        viewModel.isDatabaseEmpty().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if (savedInstanceState == null && viewModel.areRequestsDone().getValue() == null) {
+                    if (aBoolean /*|| isUpdateDataTime()*/) {
+                        initializeHttpRequests();
+                    } else {
+                        BusinessManager.getInstance().fetchBusinessListsFromDatabase(viewModel, getApplicationContext());
+                    }
+                }
+            }
+        });
 
         viewModel.areRequestsDone().observe(this, new Observer<Boolean>() {
             @Override
@@ -81,13 +97,18 @@ public class MainActivity extends AppCompatActivity {
                                 actionBar.hide();
                         }
                     } else {
-                        loading.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                loading.setVisibility(View.GONE);
-                                offlineMessage.setVisibility(View.VISIBLE);
-                            }
-                        }, 1000);
+                        if (savedInstanceState == null || wasTryAgainButtonPressed) {
+                            loading.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    loading.setVisibility(View.GONE);
+                                    offlineMessage.setVisibility(View.VISIBLE);
+                                }
+                            }, 1000);
+                        } else {
+                            loading.setVisibility(View.GONE);
+                            offlineMessage.setVisibility(View.VISIBLE);
+                        }
                     }
                 }
             }
@@ -95,19 +116,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (savedInstanceState == null)
             verifyIfDatabaseIsEmpty();
-
-        viewModel.isDatabaseEmpty().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                if (savedInstanceState == null && viewModel.areRequestsDone().getValue() == null) {
-                    if (aBoolean /*|| isUpdateDataTime()*/) {
-                        initializeHttpRequests();
-                    } else {
-                        BusinessManager.getInstance().fetchBusinessListsFromDatabase(viewModel, getApplicationContext());
-                    }
-                }
-            }
-        });
     }
 
     private class AttractionsViewPagerAdapter extends FragmentPagerAdapter {
@@ -146,7 +154,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        BusinessListsDbHelper.getInstance(this).close();
+        if (!BusinessListsDbHelper.isInstanceNull()) {
+            BusinessListsDbHelper.getInstance(this).close();
+            BusinessListsDbHelper.resetInstance();
+        }
         super.onDestroy();
     }
 

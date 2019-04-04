@@ -15,7 +15,9 @@ public class BusinessPhotoDecodeRunnable implements Runnable {
 
     @Override
     public void run() {
-        Bitmap businessPhoto = BitmapFactory.decodeByteArray(imgBytes, 0, imgBytes.length);
+        Bitmap businessPhoto = null;
+        if (imgBytes != null)
+            businessPhoto = BitmapFactory.decodeByteArray(imgBytes, 0, imgBytes.length);
         business.setBusinessPhoto(businessPhoto);
     }
 }

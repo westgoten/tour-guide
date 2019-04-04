@@ -12,7 +12,7 @@ public class BusinessListsDbHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "BusinessLists.db";
 
-    public static final int NUMBER_OF_TABLES = 4;
+    private static final int NUMBER_OF_TABLES = 4;
     private static final String SQL_CREATE_ENTRY =
             "CREATE TABLE " + BusinessListsContract.BusinessListsEntry.TABLE_NAME + "%d" + " (" +
                     BusinessListsContract.BusinessListsEntry._ID + " INTEGER PRIMARY KEY," +
@@ -30,6 +30,14 @@ public class BusinessListsDbHelper extends SQLiteOpenHelper {
             sInstance = new BusinessListsDbHelper(context.getApplicationContext());
         }
         return sInstance;
+    }
+
+    public static void resetInstance() {
+        sInstance = null;
+    }
+
+    public static boolean isInstanceNull() {
+        return (sInstance == null);
     }
 
     private BusinessListsDbHelper(Context context) {

@@ -1,8 +1,10 @@
 package com.example.rodrigo.tourguide.tasks;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import com.example.rodrigo.tourguide.AttractionListFragment;
 import com.example.rodrigo.tourguide.MainActivityViewModel;
 import com.example.rodrigo.tourguide.database.BusinessListsContract;
@@ -11,6 +13,7 @@ import com.example.rodrigo.tourguide.models.Business;
 import com.example.rodrigo.tourguide.models.BusinessSearch;
 import retrofit2.Call;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -90,6 +93,64 @@ public class BusinessManager {
         }
     }
 
+    private void writeBusinessListsToDatabase(final MainActivityViewModel viewModel, Context context) {
+        final BusinessListsDbHelper dbHelper = BusinessListsDbHelper.getInstance(context);
+
+        new Thread(new Runnable() {
+            private SQLiteDatabase db;
+            private Map<AttractionListFragment.AttractionType, List<Business>> businessMatrix;
+
+            @Override
+            public void run() {
+                db = dbHelper.getWritableDatabase();
+                businessMatrix = viewModel.getBusinessMatrix();
+                insertIntoDatabase();
+
+                dbHelper.close();
+                BusinessListsDbHelper.resetInstance();
+            }
+
+            private void insertIntoDatabase() {
+                ContentValues values = new ContentValues();
+
+                db.beginTransaction();
+                try {
+                    for (AttractionListFragment.AttractionType attractionType : businessMatrix.keySet()) {
+                        List<Business> businesses = businessMatrix.get(attractionType);
+                        for (Business business : businesses) {
+                            values.put(BusinessListsContract.BusinessListsEntry.COLUMN_NAME_NAME, business.getName());
+                            values.put(BusinessListsContract.BusinessListsEntry.COLUMN_NAME_REVIEW_COUNT, business.getReview_count());
+                            values.put(BusinessListsContract.BusinessListsEntry.COLUMN_NAME_RATING, business.getRating());
+                            values.put(BusinessListsContract.BusinessListsEntry.COLUMN_NAME_URL, business.getUrl());
+
+                            byte[] imgBytes = convertBitmapToByteArray(business.getBusinessPhoto());
+                            values.put(BusinessListsContract.BusinessListsEntry.COLUMN_NAME_PHOTO, imgBytes);
+
+                            db.insert(BusinessListsContract.BusinessListsEntry.TABLE_NAME + attractionType.ordinal(),
+                                    null, values);
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+            }
+
+            private void updateDatabase() {
+                // TO DO
+            }
+
+            private byte[] convertBitmapToByteArray(Bitmap bitmap) {
+                if (bitmap != null) {
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                    return outputStream.toByteArray();
+                }
+                return null;
+            }
+        }).start();
+    }
+
     public void fetchBusinessListsFromDatabase(final MainActivityViewModel viewModel, Context context) {
         final BusinessListsDbHelper dbHelper = BusinessListsDbHelper.getInstance(context);
         viewModel.areRequestsDone().postValue(false);
@@ -123,7 +184,6 @@ public class BusinessManager {
                             viewModel.isDatabaseEmpty().postValue(true);
                             break;
                         }
-                        viewModel.isDatabaseEmpty().postValue(false);
 
                         List<Business> businesses = new ArrayList<>();
                         totalOfPhotosDecoded += cursor.getCount();
@@ -153,11 +213,10 @@ public class BusinessManager {
                     db.setTransactionSuccessful();
                 } finally {
                     db.endTransaction();
+                    keepTrackOfDatabaseFetching(viewModel);
                 }
             }
         }).start();
-
-        keepTrackOfDatabaseFetching(viewModel);
     }
 
     public void keepTrackOfRequests(final MainActivityViewModel viewModel, final Context context) {
@@ -180,6 +239,7 @@ public class BusinessManager {
 
                 if (!viewModel.isOffline()) {
                     viewModel.areRequestsDone().postValue(true);
+                    writeBusinessListsToDatabase(viewModel, context);
                     resetInstance();
                 } else
                     fetchBusinessListsFromDatabase(viewModel, context);
