@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,7 +22,6 @@ import com.example.rodrigo.tourguide.database.BusinessListsContract;
 import com.example.rodrigo.tourguide.database.BusinessListsDbHelper;
 import com.example.rodrigo.tourguide.models.BusinessSearch;
 import com.example.rodrigo.tourguide.tasks.BusinessManager;
-import com.google.android.material.tabs.TabLayout;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -29,8 +29,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
     private MainActivityViewModel viewModel;
 
-    private TabLayout tabLayout;
+    private ViewPager viewPager;
     private LinearLayout loading;
+    private LinearLayout offlineMessage;
 
     private static final int NUM_OF_TABS = 4;
     public static final String SORT_SEARCH_BY = "rating";
@@ -46,29 +47,48 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        tabLayout = findViewById(R.id.tab_layout);
+        viewPager = findViewById(R.id.pager);
         loading = findViewById(R.id.loading);
+        offlineMessage = findViewById(R.id.offline);
+
+        Button tryAgainButton = (Button) offlineMessage.getChildAt(2);
+        tryAgainButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                offlineMessage.setVisibility(View.GONE);
+                loading.setVisibility(View.VISIBLE);
+                initializeHttpRequests();
+            }
+        });
 
         viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
         viewModel.areRequestsDone().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
-                if (aBoolean /*&& !viewModel.isDatabaseEmpty().getValue()*/) {
-                    AttractionsViewPagerAdapter pagerAdapter = new AttractionsViewPagerAdapter(getSupportFragmentManager());
-                    ViewPager viewPager = findViewById(R.id.pager);
-                    viewPager.setAdapter(pagerAdapter);
+                if (aBoolean) {
+                    if (!viewModel.isOffline() || !viewModel.isDatabaseEmpty().getValue()) {
+                        AttractionsViewPagerAdapter pagerAdapter = new AttractionsViewPagerAdapter(getSupportFragmentManager());
+                        viewPager.setAdapter(pagerAdapter);
 
-                    loading.setVisibility(View.GONE);
-                    tabLayout.setVisibility(View.VISIBLE);
+                        loading.setVisibility(View.GONE);
+                        offlineMessage.setVisibility(View.GONE);
+                        viewPager.setVisibility(View.VISIBLE);
 
-                    if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        ActionBar actionBar = getSupportActionBar();
-                        if (actionBar != null)
-                            actionBar.hide();
+                        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                            ActionBar actionBar = getSupportActionBar();
+                            if (actionBar != null)
+                                actionBar.hide();
+                        }
+                    } else {
+                        loading.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                loading.setVisibility(View.GONE);
+                                offlineMessage.setVisibility(View.VISIBLE);
+                            }
+                        }, 1000);
                     }
-                /*} else if (aBoolean && viewModel.isDatabaseEmpty()) {*/
-                    // TO DO: "No internet access. Try again." message
                 }
             }
         });
@@ -124,6 +144,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        BusinessListsDbHelper.getInstance(this).close();
+        super.onDestroy();
+    }
+
     private void initializeHttpRequests() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(YelpService.BASE_URL)
@@ -135,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
         BusinessManager businessManager = BusinessManager.getInstance();
 
         viewModel.areRequestsDone().setValue(false);
-        BusinessManager.getInstance().setOffline(false);
+        viewModel.setOffline(false);
 
         Call<BusinessSearch> businessSearchCall1 = yelpService.getBusinessSearch(getString(R.string.request_header),
                 getString(R.string.term_landmarks), null, SORT_SEARCH_BY, getString(R.string.language),

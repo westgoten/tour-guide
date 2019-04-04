@@ -21,7 +21,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class BusinessManager {
-    private boolean isOffline;
     private int totalOfBusinessesDownloaded;
     private int totalOfPhotosDecoded;
 
@@ -93,7 +92,7 @@ public class BusinessManager {
 
     public void fetchBusinessListsFromDatabase(final MainActivityViewModel viewModel, Context context) {
         final BusinessListsDbHelper dbHelper = BusinessListsDbHelper.getInstance(context);
-        viewModel.areRequestsDone().setValue(false);
+        viewModel.areRequestsDone().postValue(false);
 
         new Thread(new Runnable() {
             @Override
@@ -124,6 +123,7 @@ public class BusinessManager {
                             viewModel.isDatabaseEmpty().postValue(true);
                             break;
                         }
+                        viewModel.isDatabaseEmpty().postValue(false);
 
                         List<Business> businesses = new ArrayList<>();
                         totalOfPhotosDecoded += cursor.getCount();
@@ -178,7 +178,7 @@ public class BusinessManager {
                         running = false;
                 }
 
-                if (!isOffline) {
+                if (!viewModel.isOffline()) {
                     viewModel.areRequestsDone().postValue(true);
                     resetInstance();
                 } else
@@ -205,9 +205,5 @@ public class BusinessManager {
 
     private void resetInstance() {
         sInstance = new BusinessManager();
-    }
-
-    public void setOffline(boolean offline) {
-        isOffline = offline;
     }
 }

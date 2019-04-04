@@ -14,5 +14,10 @@
     <string name="review_count">Based on %d reviews</string>
 
     <!-- Loading animation -->
-    <string name="loading">Loading data</string>
+    <string name="loading">Loading</string>
+
+    <!-- Offline message -->
+    <string name="offline_message_title">Failed to request data</string>
+    <string name="offline_message_body">Check your internet connection.\nIf that\'s not the problem, just try again.</string>
+    <string name="offline_message_button">Try again</string>
 </resources>

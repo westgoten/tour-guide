@@ -32,10 +32,10 @@ public class BusinessListDownloadRunnable implements Runnable {
                 List<Business> businesses = businessSearch.getBusinesses();
                 viewModel.getBusinessMatrix().put(attractionType, businesses);
             } else {
-                BusinessManager.getInstance().setOffline(true);
+                viewModel.setOffline(true);
             }
         } catch (Exception e) {
-            BusinessManager.getInstance().setOffline(true);
+            viewModel.setOffline(true);
         }
     }
 }

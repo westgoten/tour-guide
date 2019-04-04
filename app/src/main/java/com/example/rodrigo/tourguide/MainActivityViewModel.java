@@ -16,6 +16,7 @@ public class MainActivityViewModel extends ViewModel {
                             AttractionListFragment.AttractionType.class));
     private MutableLiveData<Boolean> areRequestsDone = new MutableLiveData<>();
     private MutableLiveData<Boolean> isDatabaseEmpty = new MutableLiveData<>();
+    private boolean isOffline;
 
     public Map<AttractionListFragment.AttractionType, List<Business>> getBusinessMatrix() {
         return businessMatrix;
@@ -27,5 +28,13 @@ public class MainActivityViewModel extends ViewModel {
 
     public MutableLiveData<Boolean> isDatabaseEmpty() {
         return isDatabaseEmpty;
+    }
+
+    public boolean isOffline() {
+        return isOffline;
+    }
+
+    public void setOffline(boolean offline) {
+        isOffline = offline;
     }
 }
