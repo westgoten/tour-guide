@@ -105,9 +105,6 @@ public class BusinessManager {
                 db = dbHelper.getWritableDatabase();
                 businessMatrix = viewModel.getBusinessMatrix();
                 insertIntoDatabase();
-
-                dbHelper.close();
-                BusinessListsDbHelper.resetInstance();
             }
 
             private void insertIntoDatabase() {
@@ -137,7 +134,7 @@ public class BusinessManager {
             }
 
             private void updateDatabase() {
-                // TO DO
+                // TODO
             }
 
             private byte[] convertBitmapToByteArray(Bitmap bitmap) {
@@ -264,6 +261,9 @@ public class BusinessManager {
     }
 
     private void resetInstance() {
+        businessListDownloadThreadPool.shutdown();
+        businessPhotoDownloadThreadPool.shutdown();
+        businessPhotoDecodeThreadPool.shutdown();
         sInstance = new BusinessManager();
     }
 }

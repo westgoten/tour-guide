@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(Boolean aBoolean) {
                 if (savedInstanceState == null && viewModel.areRequestsDone().getValue() == null) {
-                    if (aBoolean /*|| isUpdateDataTime()*/) {
+                    if (aBoolean /*|| isUpdateDataTime() [TODO]*/) {
                         initializeHttpRequests();
                     } else {
                         BusinessManager.getInstance().fetchBusinessListsFromDatabase(viewModel, getApplicationContext());
