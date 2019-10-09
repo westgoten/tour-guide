@@ -1,6 +1,6 @@
 # Tour Guide
 
-![landmarks](screenshots/landmarks.png) ![restaurants](screenshots/restaurants.png) ![beaches](screenshots/beaches.png) ![bars](screenshots/bars.png)
+![allscreens](screenshots/allscreens.png)
 
 **Third-party libraries**
 - [Retrofit](http://square.github.io/retrofit/) by [Square](https://square.github.io/)
