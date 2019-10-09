@@ -2,6 +2,12 @@
 
 ![allscreens](screenshots/allscreens.png)
 
+**Technical Overview**
+- Yelp's REST API consumption
+- Local persistence (it works offline)
+- Click on the Yelp logo to go to the website and see more details about the
+item selected
+
 **Third-party libraries**
 - [Retrofit](http://square.github.io/retrofit/) by [Square](https://square.github.io/)
 - [Picasso](http://square.github.io/picasso/) by [Square](https://square.github.io/)
