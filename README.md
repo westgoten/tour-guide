@@ -4,6 +4,7 @@
 
 **Technical Overview**
 - Yelp's REST API consumption
+- Multithreading using ThreadPoolExecutors (good performance)
 - Local persistence (it works offline)
 - Click on the Yelp logo to go to the website and see more details about the
 item selected
